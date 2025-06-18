@@ -11,19 +11,19 @@
 </head>
 <body>
     <div class="container">
-        <h3>Tambah Data Mahasiswa</h3>
+        <h3>Ubah Data Mahasiswa</h3>
         
         <div class="alert alert-primary" id="sukses">
-        Penambahan Data Mahasiswa Sukses    
+        Perubahan Data Mahasiswa Sukses    
         </div> 
         <div class="alert alert-warning" id="gagal">
-        Penambahan Data Mahasiswa Mengalami kegagalan    
+        Perubahan Data Mahasiswa Mengalami kegagalan    
         </div> 
 
         <form id="formDataMHS" method="POST" action="">
             <div class="form-group">
                 <label class="form-label">NIM</label>
-                <input class="form-control" type="text" name="txNIM" id="txNIM">
+                <input class="form-control" type="text" name="txNIM" id="txNIM" disabled>
             </div>  
             <div class="form-group">
                 <label class="form-label">Nama Mahasiswa</label>
@@ -52,47 +52,45 @@
         </form>
     </div>
     
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="mhsbynim.js"></script>
     <script>
-        document.getElementById("sukses").style.display="none"
-        document.getElementById("gagal").style.display="none"
+        $(function(){
+            $("#sukses").hide();
+            $("#gagal").hide();
+            caridata();
 
-        let frm = document.getElementById("formDataMHS")
-        frm.addEventListener("submit", function(event){
-            event.preventDefault();
-            let nim = frm.txNIM.value
-            let nama = frm.txNAMA.value
-            let tgl = frm.txTGL.value
-            let jkel = frm.txJK.value
-            let alamat = frm.txALAMAT.value
-            let dta = `txNIM=${nim}&txNAMA=${nama}&txTGL=${tgl}&txJK=${jkel}&txALAMAT=${alamat}`
+            $("#formDataMHS").submit(function(e){
+                e.preventDefault();
+                let nim = $("#txNIM").val();
+                let nama = $("#txNAMA").val();
+                let tgl = $("#txTGL").val();
+                let jkel = $("#txJK").val();
+                let alamat = $("#txALAMAT").val();
+                let dta = `txNIM=${nim}&txNAMA=${nama}&txALAMAT=${alamat}&txTGL=${tgl}&txJK=${jkel}`;
+                let urltarget = "server/mhsupdate.php";
 
-            fetch('server/mhscreatedata.php',{
-                method: 'POST',
-                headers: {'Content-Type':'application/x-www-form-urlencoded',},
-                body: dta
-            })
-            .then(response=>response.json())
-            .then(data=>{
-                console.log("DEBUG: "+data)
-                if(data["error"]==0){
-                    document.getElementById("sukses").style.display="block"
-                    document.getElementById("gagal").style.display="none"
-                }else{
-                    document.getElementById("sukses").style.display="none"
-                    document.getElementById("gagal").style.display="block"
-                }
-            })
-            .catch(err=>{
-                console.error("DEBUG: ",err)
-                document.getElementById("sukses").style.display="none"
-                document.getElementById("gagal").style.display="block"
-            })
-
-            setTimeout(()=>{
-                window.location.href="datamahasiswa.html"
-            },2000)
-        });
-
+                $.ajax({
+                    url: urltarget,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: dta,
+                    success:function(hsl){
+                        if(hsl["error"]==0){
+                            $("#sukses").show();
+                        }else{
+                            $("#gagal").show();
+                        }
+                    },
+                    error:function(){
+                        $("#gagal").show();
+                    }
+                });
+                setTimeout(()=>{
+                    window.location.href="datamahasiswa.html"
+                },2000)
+            });
+        })
     </script>
 </body>
 </html>
